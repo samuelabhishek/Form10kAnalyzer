@@ -39,7 +39,7 @@ class Form10kExtractor:
         dl = sec_edgar_downloader.Downloader(self.download_path)
         dl.get("10-K", "MSFT", amount=1)
 
-        f = open(f"{self.download_path}\\sec-edgar-filings\\{self.ticker}\\10-K\\0001564590-20-034944\\filing-details.html", 'r', encoding = 'utf-8')
+        f = open(f"./{self.download_path}/sec-edgar-filings/{self.ticker}/10-K/0001564590-20-034944/filing-details.html", 'r', encoding = 'utf-8')
         HtmlDoc = f.read()
         SoupDoc = BeautifulSoup(HtmlDoc, 'html.parser')
         TextDoc = str(SoupDoc.get_text())
