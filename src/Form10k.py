@@ -14,7 +14,7 @@ from collections import Counter
 print("Completed Imports")
 
 
-class Form10k:
+class Form10kExtractor:
 
     def __init__ (self, download_path, company, section, is_ticker = None):
         self.is_ticker = is_ticker if is_ticker is not None else False
