@@ -1,4 +1,4 @@
-import src.Form10k
+from src.Form10k import Form10kAnalyzer, Form10kExtractor, clean_text
 
 
 def main():
