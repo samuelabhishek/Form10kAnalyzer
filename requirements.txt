@@ -1,0 +1,5 @@
+pandas
+numpy
+spacy
+sec_edgar_downloader
+bs4
