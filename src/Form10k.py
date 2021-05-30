@@ -10,6 +10,7 @@ from bs4 import BeautifulSoup
 import re
 from spacy.matcher import PhraseMatcher
 from collections import Counter
+import os
 
 print("Completed Imports")
 
@@ -23,13 +24,25 @@ class Form10kExtractor:
         self.download_path = download_path
         self.section = section
         print("Extracting Report")
-        self.get_report()
+        try:
+            self.get_report()
+        except:
+            print("Error getting report")
         print("Extracting Section")
-        self.get_section()
+        try:
+            self.get_section()
+        except:
+            print("Error getting section")
         print("Extracting Subsection Headers")
-        self.get_subsection_headers()
+        try:
+            self.get_subsection_headers()
+        except:
+            print("Error getting subsection header")
         print("Extracting Subsections")
-        self.get_subsections()
+        # try:
+        #     self.get_subsections()
+        # except:
+        #     print("Error getting subsection")
 
     def get_ticker(self):
         Tickerdf = pd.read_csv("./src/files/secwiki_tickers.csv")
@@ -54,9 +67,10 @@ class Form10kExtractor:
 
     def get_report(self):
         dl = sec_edgar_downloader.Downloader(self.download_path)
-        dl.get("10-K", "MSFT", amount=1)
+        dl.get("10-K", self.ticker, amount=1)
+        ReportNumber = os.listdir(f"./{self.download_path}/sec-edgar-filings/{self.ticker}/10-K")
 
-        f = open(f"./{self.download_path}/sec-edgar-filings/{self.ticker}/10-K/0001564590-20-034944/filing-details.html", 'r', encoding = 'utf-8')
+        f = open(f"./{self.download_path}/sec-edgar-filings/{self.ticker}/10-K/{ReportNumber[0]}/filing-details.html", 'r', encoding = 'utf-8')
         HtmlDoc = f.read()
         SoupDoc = BeautifulSoup(HtmlDoc, 'html.parser')
         TextDoc = str(SoupDoc.get_text())
@@ -85,7 +99,7 @@ class Form10kExtractor:
 
         self.html_section_ = self.html_doc_[StartSectionIndex:EndSectionIndex]
         self.soup_section_ = BeautifulSoup(self.html_section_, 'html.parser')
-        self.text_section_ = self.soup_section_.get_text()
+        self.text_section_ = str(self.soup_section_.get_text())
 
 
     def get_subsection_headers(self):

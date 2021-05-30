@@ -3,8 +3,9 @@ from Form10k import Form10kAnalyzer, Form10kExtractor, clean_text
 
 def main():
 
-    myform = Form10kExtractor(download_path = r"documentRepo", company = "Microsoft Corporation", section = 'Risk Factors' ,is_ticker= False)
+    myform = Form10kExtractor(download_path = r"documentRepo", company = "Apple Inc.", section = 'Risk Factors' ,is_ticker= False)
     myformanalysis = Form10kAnalyzer(myform)
+    print(myform.text_section_)
     print("Code run complete!")
     
     
