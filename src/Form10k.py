@@ -18,7 +18,7 @@ class Form10kExtractor:
 
     def __init__ (self, download_path, company, section, is_ticker = None):
         self.is_ticker = is_ticker if is_ticker is not None else False
-        self.company = company
+        self.company = company if self.is_ticker is False else self.get_company()
         self.ticker = company if self.is_ticker is True else self.get_ticker()
         self.download_path = download_path
         self.section = section
@@ -31,9 +31,26 @@ class Form10kExtractor:
         print("Extracting Subsections")
         self.get_subsections()
 
-
     def get_ticker(self):
-        return "MSFT"
+        Tickerdf = pd.read_csv("./src/files/secwiki_tickers.csv")
+        Tickers = Tickerdf.loc[:,'Ticker']
+        Names = Tickerdf.loc[:,'Name']
+        TickerDict = {}
+        for ticker, name in list(zip(Tickers, Names)):
+            TickerDict[name] = ticker
+        ticker = TickerDict[self.company]
+        return ticker
+
+    def get_company(self):
+        Tickerdf = pd.read_csv("./src/files/secwiki_tickers.csv")
+        Tickers = Tickerdf.loc[:,'Ticker']
+        Names = Tickerdf.loc[:,'Name']
+        TickerDict = {}
+        for ticker, name in list(zip(Tickers, Names)):
+            TickerDict[ticker] = name
+        name = TickerDict[self.ticker]
+        return name
+
 
     def get_report(self):
         dl = sec_edgar_downloader.Downloader(self.download_path)
