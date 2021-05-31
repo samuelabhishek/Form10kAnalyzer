@@ -9,14 +9,17 @@ from spacy import matcher
 from bs4 import BeautifulSoup
 import re
 from spacy.matcher import PhraseMatcher
+from spacytextblob.spacytextblob import SpacyTextBlob
 from collections import Counter
 import os
+import streamlit as st
 
 print("Completed Imports")
 
 
 class Form10kExtractor:
 
+    
     def __init__ (self, download_path, company, section, is_ticker = None):
         self.is_ticker = is_ticker if is_ticker is not None else False
         self.company = company if self.is_ticker is False else self.get_company()
@@ -24,6 +27,7 @@ class Form10kExtractor:
         self.download_path = download_path
         self.section = section
         self.nlp = spacy.load("en_core_web_lg")
+        self.nlp.add_pipe('spacytextblob')
         print("Extracting Report")
         try:
             self.get_report()
@@ -32,15 +36,17 @@ class Form10kExtractor:
         print("Extracting Section")
         try:
             self.get_section()
+            print("sections extracted!")
         except:
             print("Error getting section")
         try:
             self.get_subsections()
+            print("subsections extracted!")
         except:
             print("error getting subsections")
 
 
-
+    
     def get_ticker(self):
         Tickerdf = pd.read_csv("./src/files/secwiki_tickers.csv")
         Tickers = Tickerdf.loc[:,'Ticker']
@@ -51,6 +57,8 @@ class Form10kExtractor:
         ticker = TickerDict[self.company]
         return ticker
 
+    
+    
     def get_company(self):
         Tickerdf = pd.read_csv("./src/files/secwiki_tickers.csv")
         Tickers = Tickerdf.loc[:,'Ticker']
@@ -62,6 +70,7 @@ class Form10kExtractor:
         return name
 
 
+    
     def get_report(self):
         dl = sec_edgar_downloader.Downloader(self.download_path)
         dl.get("10-K", self.ticker, amount=1)
@@ -75,6 +84,8 @@ class Form10kExtractor:
         self.html_doc_ = HtmlDoc
         self.text_doc_ = TextDoc
 
+
+    
     def get_section(self):
 
         ## Working on the Table of Contents to pick up the IDs of the section to be extracted
@@ -107,6 +118,7 @@ class Form10kExtractor:
         self.text_section_ = str(self.soup_section_.get_text())
 
 
+    
     def get_subsections(self):
 
         try:
@@ -118,6 +130,7 @@ class Form10kExtractor:
         # Going back to the extracted text to pick up sebsections for each header
 
 
+    
     def get_subsection_headers(self):
 
         # A reliable way to get the risk headings but some of the section text is missing
@@ -128,6 +141,7 @@ class Form10kExtractor:
         self.subsection_headers_ = [list(doc.sents)[0] for doc in ListSubSection_ForHeaders_SpacyDocs]
 
 
+    
     def get_bold_subsections(self):
 
         Section_SpacyDoc = self.nlp(self.text_section_)
@@ -149,18 +163,38 @@ class Form10kExtractor:
         self.subsections_ = list(zip(range(self.subsection_count_), self.subsection_headers_, self.subsection_contents_))
 
 
+    
     def get_div_subsections(self):
         self.subsections_ = [div.get_text() for div in self.soup_section_.find_all('div') if len(div.get_text()) > 50]
 
 
 class Form10kAnalyzer:
 
+    
     def __init__(self, form):
-        self.get_entities(form)
+        try:
+            self.get_entities(form)
+            print("Entities extracted!")
+        except:
+            print("Error getting entities")
+        try:
+            self.get_sentiment(form)
+            print("Sentiment extracted")
+        except:
+            print("Error getting sentiment")
 
+    
     def get_entities(self, form):
         self.Section_SpacyDoc = form.nlp(form.text_section_)
-        self.entities = self.Section_SpacyDoc.ents
+        self.entities_text_ = [ent.text for ent in self.Section_SpacyDoc.ents]
+        self.entities_label_ = [ent.label_ for ent in self.Section_SpacyDoc.ents]
+
+    
+    
+    def get_sentiment(self, form):
+        self.subsections_sentiment_polarity_ = [form.nlp(subsection)._.polarity for subsection in form.subsections_]
+        self.subsections_sentiment_subjectivity_ = [form.nlp(subsection)._.subjectivity for subsection in form.subsections_]
+
 
 
 def clean_text(text):
