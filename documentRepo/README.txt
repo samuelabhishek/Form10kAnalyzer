@@ -1,0 +1,1 @@
+This is a placeholder folder where the 10k reports are downloaded to
