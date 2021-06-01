@@ -26,7 +26,8 @@ def main():
 
     company = st.sidebar.selectbox("Company", list(Names), index=2007, help = 'select the company who\'s 10k report you want to extract')
     
-    section = st.sidebar.selectbox("Section", ['Risk Factors'], index = 0, help = 'select the section that you want to extract from he 10k report')
+    section = st.sidebar.selectbox("Section", ["Business", "Risk Factors", "Unresolved Staff Comments", "Properties", "Legal Proceedings" ,"Management’s Discussion and Analysis of Financial Condition and Results of Operations", "Quantitative and Qualitative Disclosures About Market Risk" , "Changes in and Disagreements with Accountants on Accounting and Financial Disclosure",
+    "Controls and Procedures", "Form 10-K Summary"], index = 0, help = 'select the section that you want to extract from he 10k report')
 
     st.header(company)
 
@@ -42,7 +43,7 @@ def main():
     headerstext = [clean_text(header.text) if type(header) is spacy.tokens.span.Span else clean_text(header) for header in myform.subsection_headers_]
     contentstext = [clean_text(content.text) if type(content) is spacy.tokens.span.Span else clean_text(content) for content in myform.subsection_contents_]
     subsection_sentiment_df = pd.DataFrame(zip(headerstext, contentstext, myformanalysis.subsections_sentiment_polarity_, myformanalysis.subsections_sentiment_subjectivity_), 
-    columns = ['Risk Factor - Header', 'Risk Factor - Detailed', 'Sentiment - Polarity', 'Sentimeny - Subjectivity'])
+    columns = ['Header', 'Detailed', 'Sentiment - Polarity', 'Sentimeny - Subjectivity'])
 
     section_entities_df = get_entites_df(myformanalysis)
 
