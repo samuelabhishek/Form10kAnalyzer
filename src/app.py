@@ -3,26 +3,52 @@ import streamlit as st
 import pandas as pd
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
+import spacy
 
 
 def main():
+
+
+    # Get Data
+
+
+    Tickerdf = pd.read_csv("./src/files/secwiki_tickers.csv")
+    Tickers = Tickerdf.loc[:,'Ticker']
+    Names = Tickerdf.loc[:,'Name']
+
+
     # Streamlit App
+
 
     st.title("Market Intelligence")
      
-    st.header("Analyze Risk Factors and other Key textual information from Form-10k data!")
+    st.text("Analyze Risk Factors and other Key textual information from Form-10k data!")
+
+    company = st.sidebar.selectbox("Company", list(Names), index=2007, help = 'select the company who\'s 10k report you want to extract')
     
-    section = st.sidebar.selectbox("Section", ['Risk Factors', 'undefined'], index = 0, help = 'select the section that you want to extract from he 10k report')
+    section = st.sidebar.selectbox("Section", ['Risk Factors'], index = 0, help = 'select the section that you want to extract from he 10k report')
+
+    st.header(company)
 
     st.subheader(section)
 
-    myform = Form10kExtractor(download_path = r"documentRepo", company = "Apple Inc.", section = section ,is_ticker = False)
+
+    # Do Analysis
+
+
+    myform = Form10kExtractor(download_path = r"documentRepo", company = company, section = section ,is_ticker = False)
     myformanalysis = Form10kAnalyzer(myform)
 
-    subsection_sentiment_df = pd.DataFrame(zip(myform.subsections_, myformanalysis.subsections_sentiment_polarity_, myformanalysis.subsections_sentiment_subjectivity_), 
-    columns = ['Risk Factor', 'Sentiment - Polarity', 'Sentimeny - Subjectivity'])
+    headerstext = [clean_text(header.text) if type(header) is spacy.tokens.span.Span else clean_text(header) for header in myform.subsection_headers_]
+    contentstext = [clean_text(content.text) if type(content) is spacy.tokens.span.Span else clean_text(content) for content in myform.subsection_contents_]
+    subsection_sentiment_df = pd.DataFrame(zip(headerstext, contentstext, myformanalysis.subsections_sentiment_polarity_, myformanalysis.subsections_sentiment_subjectivity_), 
+    columns = ['Risk Factor - Header', 'Risk Factor - Detailed', 'Sentiment - Polarity', 'Sentimeny - Subjectivity'])
 
-    section_entities_df = get_entites_df(myformanalysis)    
+    section_entities_df = get_entites_df(myformanalysis)
+
+
+    # Stramlit App
+
 
     st.image(get_section_wordcloud(myform, myformanalysis))
 

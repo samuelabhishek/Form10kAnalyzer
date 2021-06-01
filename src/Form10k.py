@@ -124,9 +124,12 @@ class Form10kExtractor:
         try:
             self.get_subsection_headers()
             self.get_bold_subsections()
+            
         except:
             print("Unable to indentify individual headers. Extracting each paragraph as a subsection instead")
             self.get_div_subsections()
+
+            
         # Going back to the extracted text to pick up sebsections for each header
 
 
@@ -160,12 +163,14 @@ class Form10kExtractor:
             prevEnd = end
         self.subsection_contents_.append(Section_SpacyDoc[prevEnd:])
 
-        self.subsections_ = list(zip(range(self.subsection_count_), self.subsection_headers_, self.subsection_contents_))
+        self.subsections_ = list(zip(self.subsection_headers_, self.subsection_contents_))
 
 
     
     def get_div_subsections(self):
-        self.subsections_ = [div.get_text() for div in self.soup_section_.find_all('div') if len(div.get_text()) > 50]
+        self.subsection_contents_ = [div.get_text() for div in self.soup_section_.find_all('div') if len(div.get_text()) > 50]
+        self.subsection_headers_ = ['N/A' for i in self.subsection_contents_]
+        self.subsections_ = list(zip(self.subsection_headers_, self.subsection_contents_))
 
 
 class Form10kAnalyzer:
@@ -192,8 +197,8 @@ class Form10kAnalyzer:
     
     
     def get_sentiment(self, form):
-        self.subsections_sentiment_polarity_ = [form.nlp(subsection)._.polarity for subsection in form.subsections_]
-        self.subsections_sentiment_subjectivity_ = [form.nlp(subsection)._.subjectivity for subsection in form.subsections_]
+        self.subsections_sentiment_polarity_ = [form.nlp(str(subsection))._.polarity for subsection in form.subsection_contents_]
+        self.subsections_sentiment_subjectivity_ = [form.nlp(str(subsection))._.subjectivity for subsection in form.subsection_contents_]
 
 
 
