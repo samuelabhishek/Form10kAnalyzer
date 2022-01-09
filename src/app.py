@@ -73,9 +73,11 @@ def main():
 
     st.plotly_chart(fig, use_container_width= True)
 
+    st.subheader('Sentiment Analysis')  
+
     st.dataframe(myformanalysis.subsection_sentiment_df, width= 1250)
 
-    st.subheader("Entities found in section")
+    st.subheader("Named Entities extracted")
 
     st.dataframe(myformanalysis.section_entities_df, width = 1250)
 
