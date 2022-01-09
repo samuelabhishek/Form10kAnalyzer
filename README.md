@@ -15,3 +15,18 @@ Alternatively you can use the streamlit dashboard to interatively select compani
 * On your command promt type `streamlit run src/app.py`
 
 * You should be able to view the interactive streamlit dashboard
+
+
+
+
+![dashboard1](https://github.com/samuelabhishek/Form10kAnalyzer/blob/main/documentRepo/imgs/db1.PNG)
+
+
+
+
+![dashboard2](https://github.com/samuelabhishek/Form10kAnalyzer/blob/main/documentRepo/imgs/db2.PNG)
+
+
+
+
+![dashboard3](https://github.com/samuelabhishek/Form10kAnalyzer/blob/main/documentRepo/imgs/db3.PNG)
