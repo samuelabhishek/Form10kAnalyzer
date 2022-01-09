@@ -12,4 +12,4 @@ COPY ./src ./src
 
 COPY ./documentRepo ./documentRepo
 
-CMD ["python", "./src/program.py"]
+CMD ["python", "./src/app.py"]

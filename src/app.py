@@ -1,15 +1,15 @@
-from Form10k import Form10kAnalyzer, Form10kExtractor, clean_text
-import streamlit as st
-import pandas as pd
-from wordcloud import WordCloud
-import matplotlib.pyplot as plt
-import spacy
-
-
 def main():
 
+    import streamlit as st
+    import pandas as pd
+    import form10k
+    import plotly.express as px
+    import datetime as dt
+    import os
+    import joblib
 
-    # Get Data
+
+    # Get Ticker Data
 
 
     Tickerdf = pd.read_csv("./src/files/secwiki_tickers.csv")
@@ -17,8 +17,11 @@ def main():
     Names = Tickerdf.loc[:,'Name']
 
 
-    # Streamlit App
+    # Design Streamlit App
 
+    st.set_page_config(page_title= 'Market Intelligence', layout= 'wide')    
+
+    mybar = st.progress(0)
 
     st.title("Market Intelligence")
      
@@ -33,45 +36,52 @@ def main():
 
     st.subheader(section)
 
-
-    # Do Analysis
-
-
-    myform = Form10kExtractor(download_path = r"documentRepo", company = company, section = section ,is_ticker = False)
-    myformanalysis = Form10kAnalyzer(myform)
-
-    headerstext = [clean_text(header.text) if type(header) is spacy.tokens.span.Span else clean_text(header) for header in myform.subsection_headers_]
-    contentstext = [clean_text(content.text) if type(content) is spacy.tokens.span.Span else clean_text(content) for content in myform.subsection_contents_]
-    subsection_sentiment_df = pd.DataFrame(zip(headerstext, contentstext, myformanalysis.subsections_sentiment_polarity_, myformanalysis.subsections_sentiment_subjectivity_), 
-    columns = ['Header', 'Detailed', 'Sentiment - Polarity', 'Sentimeny - Subjectivity'])
-
-    section_entities_df = get_entites_df(myformanalysis)
+    mybar.progress(10)
 
 
-    # Stramlit App
+    # Perform 10-K Analysis
+
+    ticker = Tickerdf.loc[Tickerdf['Name']== company, 'Ticker'].values[0]
 
 
-    st.image(get_section_wordcloud(myform, myformanalysis))
 
-    st.dataframe(subsection_sentiment_df)
+    myform = form10k.Form10kExtractor(download_path = r"documentRepo", company = company, section = section ,is_ticker = False)
+
+    mybar.progress(30)
+
+    myformanalysis = form10k.Form10kAnalyzer(myform)
+
+    mybar.progress(75)
+
+
+    # Get Stock Data
+
+    stock_df = form10k.get_stock_data(date = myform.date_doc_, source = 'yahoo', ticker = myform.ticker)
+
+    fig = px.line(stock_df, x = stock_df.index, y = 'Adj Close')
+
+    fig.add_vline(x=dt.datetime.strptime(myform.date_doc_, r'%m/%d/%y').timestamp() * 1000, line_width = 3, line_color = 'black', annotation_text = 'Report release date')
+
+    mybar.progress(85)
+
+    # Design Stramlit App
+
+
+    st.image(myformanalysis.get_section_wordcloud(myform),  width=1250)
+
+    st.subheader('Impact of the report on stock price')  
+
+    st.plotly_chart(fig, use_container_width= True)
+
+    st.dataframe(myformanalysis.subsection_sentiment_df, width= 1250)
 
     st.subheader("Entities found in section")
 
-    st.dataframe(section_entities_df)
+    st.dataframe(myformanalysis.section_entities_df, width = 1250)
 
+    mybar.progress(100)
 
-def get_entites_df(myformanalysis):
-    entities_label_df = pd.DataFrame(zip(myformanalysis.entities_text_,myformanalysis.entities_label_), columns=['Entity','Label'])
-    entities_label_count_df = pd.DataFrame(entities_label_df.value_counts(), columns=['# of Occurances']).reset_index()
-    return entities_label_count_df
-
-def get_section_wordcloud(myform, myformanalysis):
-    wordcloud = WordCloud(width = 1200, height = 600, max_font_size=70, prefer_horizontal = 1, stopwords = myformanalysis.entities_text_ + list(myform.nlp.Defaults.stop_words)).generate_from_text(myform.text_section_)
-    return wordcloud.to_image()
-    
-
-
-
+    mybar.empty()
 
 if __name__ == '__main__':
     
