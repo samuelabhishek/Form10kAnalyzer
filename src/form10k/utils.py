@@ -262,7 +262,6 @@ def clean_text(text):
     return(text)
 
 
-
 def get_stock_data(ticker, date, source):
     df = DataReader(ticker, source, start = (datetime.strptime(date, r'%m/%d/%y') - timedelta(days = 30)), end = (datetime.strptime(date, r'%m/%d/%y') + timedelta(days = 30)))
     return df

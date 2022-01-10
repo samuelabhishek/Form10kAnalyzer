@@ -6,7 +6,7 @@ def main():
     import plotly.express as px
     import datetime as dt
     import os
-    import joblib
+    import re
 
 
     # Get Ticker Data
@@ -69,15 +69,19 @@ def main():
 
     st.image(myformanalysis.get_section_wordcloud(myform),  width=1250)
 
-    st.subheader('Impact of the report on stock price')  
+    for i, _ in enumerate(myform.subsections_):
+        st.subheader(myform.subsection_headers_[i])
+        st.text(re.sub(r'\n\s*\n', '\n\n', str(myform.subsection_contents_[i])))
+
+    st.header('Impact of the report on stock price')  
 
     st.plotly_chart(fig, use_container_width= True)
 
-    st.subheader('Sentiment Analysis')  
+    st.header('Sentiment Analysis')  
 
     st.dataframe(myformanalysis.subsection_sentiment_df, width= 1250)
 
-    st.subheader("Named Entities extracted")
+    st.header("Named Entities extracted")
 
     st.dataframe(myformanalysis.section_entities_df, width = 1250)
 
