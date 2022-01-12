@@ -72,10 +72,13 @@ class Form10kExtractor:
     def get_report(self):
 
 
-        if self.ticker not in os.listdir(f'{self.download_path}/sec-edgar-filings'):
+        if 'sec-edgar-filings' not in os.listdir(f'{self.download_path}'):
             dl = sec_edgar_downloader.Downloader(self.download_path)
             dl.get("10-K", self.ticker, amount=1)
 
+        elif self.ticker not in os.listdir(f'{self.download_path}/sec-edgar-filings'):
+            dl = sec_edgar_downloader.Downloader(self.download_path)
+            dl.get("10-K", self.ticker, amount=1)
         
         else:
             print(f'Form10k for {self.company} found in cache')
