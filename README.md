@@ -27,14 +27,14 @@ On your command prompt:
 
 
 
-![dashboard1](https://github.com/samuelabhishek/Form10kAnalyzer/blob/main/documentRepo/imgs/db1.PNG)
+![dashboard1](documentRepo/imgs/db1.PNG)
 
 
 
 
-![dashboard2](https://github.com/samuelabhishek/Form10kAnalyzer/blob/main/documentRepo/imgs/db2.PNG)
+![dashboard2](documentRepo/imgs/db2.PNG)
 
 
 
 
-![dashboard3](https://github.com/samuelabhishek/Form10kAnalyzer/blob/main/documentRepo/imgs/db3.PNG)
+![dashboard3](documentRepo/imgs/db3.PNG)
