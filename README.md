@@ -8,11 +8,19 @@ Alternatively you can use the streamlit dashboard to interatively select compani
 
 ## Steps to view streamlit dashboard
 
-* Clone the repository
+* Clone/Download the repository
 
-* On your command prompt change directory to the folder where the repository is downloaded
+On your command prompt:
 
-* On your command promt type `streamlit run src/app.py`
+* Change directory to the folder where the repository is cloned/downloaded `cd <path to repository>`
+
+* Create a virtual environment `conda create -n <environment name> python=3.9 jupyter`
+
+* Activate the virtual environment `conda activate <environment name>`
+
+* Install the dependancies `pip install -r requirements.txt`
+
+* Type `streamlit run src/app.py`
 
 * You should be able to view the interactive streamlit dashboard
 
